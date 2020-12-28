@@ -13,18 +13,15 @@ import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.references.builder.buildErrorNamedReference
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedCallableReference
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
+import org.jetbrains.kotlin.fir.resolve.*
 import org.jetbrains.kotlin.fir.resolve.calls.Candidate
 import org.jetbrains.kotlin.fir.resolve.calls.FirErrorReferenceWithCandidate
 import org.jetbrains.kotlin.fir.resolve.calls.FirNamedReferenceWithCandidate
 import org.jetbrains.kotlin.fir.resolve.calls.varargElementType
-import org.jetbrains.kotlin.fir.resolve.constructFunctionalTypeRef
-import org.jetbrains.kotlin.fir.resolve.createFunctionalType
-import org.jetbrains.kotlin.fir.resolve.firProvider
 import org.jetbrains.kotlin.fir.resolve.inference.inferenceComponents
 import org.jetbrains.kotlin.fir.resolve.inference.isBuiltinFunctionalType
 import org.jetbrains.kotlin.fir.resolve.inference.isSuspendFunctionType
 import org.jetbrains.kotlin.fir.resolve.inference.returnType
-import org.jetbrains.kotlin.fir.resolve.propagateTypeFromQualifiedAccessAfterNullCheck
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.FirArrayOfCallTransformer
 import org.jetbrains.kotlin.fir.resolve.transformers.body.resolve.remapArgumentsWithVararg
@@ -520,7 +517,14 @@ class FirCallCompletionResultsWriterTransformer(
         checkNotNullCall: FirCheckNotNullCall,
         data: ExpectedArgumentType?
     ): CompositeTransformResult<FirStatement> {
-        return transformSyntheticCall(checkNotNullCall, data)
+        return transformSyntheticCall(checkNotNullCall, data) { mode ->
+            checkNotNullCall.replaceArgumentList(
+                checkNotNullCall.argumentList.transform<FirArgumentList, ExpectedArgumentType?>(
+                    this,
+                    mode ?: ExpectedArgumentType.ExpectedType(checkNotNullCall.typeRef.coneType.withNullability(ConeNullability.NULLABLE))
+                ).single
+            )
+        }
     }
 
     override fun transformElvisExpression(
@@ -533,6 +537,7 @@ class FirCallCompletionResultsWriterTransformer(
     private inline fun <reified D> transformSyntheticCall(
         syntheticCall: D,
         data: ExpectedArgumentType?,
+        transformArguments: (ExpectedArgumentType?) -> Unit = {}
     ): CompositeTransformResult<FirStatement> where D : FirResolvable, D : FirExpression {
         syntheticCall.transformChildren(this, data?.getExpectedType(syntheticCall)?.toExpectedType())
         val calleeReference = syntheticCall.calleeReference as? FirNamedReferenceWithCandidate ?: return syntheticCall.compose()
@@ -541,6 +546,7 @@ class FirCallCompletionResultsWriterTransformer(
 
         val typeRef = typeCalculator.tryCalculateReturnType(declaration)
         syntheticCall.replaceTypeRefWithSubstituted(calleeReference, typeRef)
+        transformArguments(data)
 
         return (syntheticCall.transformCalleeReference(
             StoreCalleeReference,

@@ -1,6 +1,6 @@
 FILE: SpecialCallsWithLambdas.kt
     public final fun foo(): R|kotlin/Unit| {
-        lval inv: R|() -> kotlin/Function0<kotlin/Unit>| = fun <anonymous>(): <ERROR TYPE REF: No type for block> {
+        lval inv: R|() -> kotlin/Function0<kotlin/Unit>| = fun <anonymous>(): R|() -> kotlin/Unit| {
             ^ fun <anonymous>(): R|kotlin/Unit| {
                 ^ Unit
             }
