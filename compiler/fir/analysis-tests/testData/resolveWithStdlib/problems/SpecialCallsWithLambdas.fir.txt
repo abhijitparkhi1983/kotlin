@@ -1,28 +1,17 @@
 FILE: SpecialCallsWithLambdas.kt
-    public abstract interface FlowCollector<in T> : R|kotlin/Any| {
-    }
-    @R|kotlin/Suppress|(vararg(String(EXPERIMENTAL_API_USAGE_ERROR))) public final fun <L> flow(@R|kotlin/BuilderInference|() block: R|suspend FlowCollector<L>.() -> kotlin/Unit|): R|Flow<L>| {
-        ^flow R|/Flow.Flow|<R|L|>(R|<local>/block|)
-    }
-    public final class Flow<out R> : R|kotlin/Any| {
-        public constructor<out R>(block: R|suspend FlowCollector<R>.() -> kotlin/Unit|): R|Flow<R>| {
-            super<R|kotlin/Any|>()
-        }
-
-        private final val block: R|suspend FlowCollector<R>.() -> kotlin/Unit| = R|<local>/block|
-            private get(): R|suspend FlowCollector<R>.() -> kotlin/Unit|
-
-    }
-    public final fun poll72(): R|Flow<kotlin/String>| {
-        ^poll72 R|/flow|<R|kotlin/String|>(<L> = flow@fun R|FlowCollector<kotlin/String>|.<anonymous>(): R|kotlin/Unit| {
-            lval inv: R|() -> kotlin/Function0<kotlin/Unit>| = flow@fun <anonymous>(): <ERROR TYPE REF: No type for block> {
-                ^ flow@fun <anonymous>(): R|kotlin/Unit| {
-                    ^@flow Unit
-                }
-
+    public final fun foo(): R|kotlin/Unit| {
+        lval inv: R|() -> kotlin/Function0<kotlin/Unit>| = fun <anonymous>(): <ERROR TYPE REF: No type for block> {
+            ^ fun <anonymous>(): R|kotlin/Unit| {
+                ^ Unit
             }
-            !!
-            R|<local>/inv|.R|SubstitutionOverride<kotlin/Function0.invoke: R|() -> kotlin/Unit|>|()
+
         }
-        )
+        !!
+        lval bar: R|() -> kotlin/Function0<kotlin/Unit>| = fun <anonymous>(): R|() -> kotlin/Unit| {
+            ^ fun <anonymous>(): R|kotlin/Unit| {
+                ^ Unit
+            }
+
+        }
+
     }
