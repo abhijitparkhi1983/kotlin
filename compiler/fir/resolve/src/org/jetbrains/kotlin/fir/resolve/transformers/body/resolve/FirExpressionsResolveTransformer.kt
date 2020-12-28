@@ -535,7 +535,10 @@ open class FirExpressionsResolveTransformer(transformer: FirBodyResolveTransform
             return checkNotNullCall.compose()
         }
 
-        checkNotNullCall.argumentList.transformArguments(transformer, ResolutionMode.ContextDependent)
+        val expectedArgumentType =
+            if (data is ResolutionMode.WithExpectedType && data.expectedType !is FirImplicitTypeRef) data
+            else ResolutionMode.ContextDependent
+        checkNotNullCall.argumentList.transformArguments(transformer, expectedArgumentType)
 
         var callCompleted = false
         val result = components.syntheticCallGenerator.generateCalleeForCheckNotNullCall(checkNotNullCall, resolutionContext)?.let {

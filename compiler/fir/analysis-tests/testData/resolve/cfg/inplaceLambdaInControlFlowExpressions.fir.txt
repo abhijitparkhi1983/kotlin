@@ -29,8 +29,8 @@ FILE: inplaceLambdaInControlFlowExpressions.kt
 
     }
     public final fun test_3(): R|kotlin/Unit| {
-        lval x: R|kotlin/String| = R|kotlin/run|<R|kotlin/String?|>(<L> = run@fun <anonymous>(): R|kotlin/String?| <kind=EXACTLY_ONCE>  {
-            ^ R|/materialize|<R|kotlin/String?|>()
+        lval x: R|kotlin/String| = R|kotlin/run|<R|kotlin/String|>(<L> = run@fun <anonymous>(): R|kotlin/String| <kind=EXACTLY_ONCE>  {
+            ^ R|/materialize|<R|kotlin/String|>()
         }
         )!!
     }
